@@ -1,22 +1,35 @@
 import got from "got";
 import { load } from "cheerio";
+import scrapingbee from "scrapingbee";
 
-export function getWebPageTitles(urls) {
-  const pagePromises = urls.map((url) => {
-    return got(url);
+async function get(url) {
+  var client = new scrapingbee.ScrapingBeeClient(
+    "N5GB02IJPO01XT64Z77B9HUXJWFN8MFAJRBV4WIR4QW138DLNOJ8LZ907O7TYQV3SJPXTATOX8BNCOTT"
+  );
+  var response = await client.get({
+    url: url,
+    params: {},
   });
+  return response;
+}
 
-  const links = Promise.all(pagePromises).then((pages) => {
-    return pages.map((page) => {
-      const $ = load(page.body);
-      const webpageTitle = $("title").text();
+export async function getWebPageTitles(urls) {
+  const links = [];
 
-      return {
-        url: page.requestUrl.href,
+  const promises = urls.map((url) => {
+    return get(url).then((response) => {
+      var decoder = new TextDecoder();
+      var text = decoder.decode(response.data);
+      const webpageTitle = load(text)("title").text();
+
+      links.push({
+        url,
         title: webpageTitle,
-      };
+      });
     });
   });
+
+  await Promise.all(promises);
 
   return links;
 }

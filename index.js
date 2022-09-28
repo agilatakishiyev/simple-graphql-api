@@ -24,7 +24,7 @@ const schema = buildSchema(`
 async function getRecords(args, ctx) {
   const message = String(args.message);
 
-  const mentionsRegex = /@([A-z]+)\b\s/gi;
+  const mentionsRegex = /@([A-z]+)\b[^\w]/gi;
   const mentionsMatches = message.match(mentionsRegex);
 
   const emoticonsRegex = /(^|\()([A-z]+)\b\)/gi;
@@ -35,11 +35,17 @@ async function getRecords(args, ctx) {
   const linkMatches = message.match(linksRegex);
 
   return {
-    mentions: mentionsMatches.map((mention) => mention.substring(1).trimEnd()),
-    emoticons: emoticonsMatches.map((emoticon) =>
-      emoticon.substring(1, emoticon.length - 1)
-    ),
-    links: getWebPageTitles(linkMatches),
+    mentions:
+      mentionsMatches &&
+      mentionsMatches.map((mention) =>
+        mention.substring(1, mention.length - 1)
+      ),
+    emoticons:
+      emoticonsMatches &&
+      emoticonsMatches.map((emoticon) =>
+        emoticon.substring(1, emoticon.length - 1)
+      ),
+    links: linkMatches && getWebPageTitles(linkMatches),
   };
 }
 
