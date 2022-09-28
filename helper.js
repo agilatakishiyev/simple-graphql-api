@@ -4,6 +4,7 @@ import scrapingbee from "scrapingbee";
 
 async function get(url) {
   var client = new scrapingbee.ScrapingBeeClient(
+    // I know this is not good :), but didn't want to mess with your time with extra configuration and stuff like that
     "N5GB02IJPO01XT64Z77B9HUXJWFN8MFAJRBV4WIR4QW138DLNOJ8LZ907O7TYQV3SJPXTATOX8BNCOTT"
   );
   var response = await client.get({
